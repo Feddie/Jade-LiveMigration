@@ -1,6 +1,10 @@
 package agents;
 
-import behav.MigrateOut;
+import java.util.Iterator;
+import org.virtualbox_5_0.*;
+
+import behav.*;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -11,15 +15,17 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 
 public class Teleporter extends Agent {
 	
+	public AID[] migr_sites;
+	
 	protected void setup() {
 		System.out.println(this.getLocalName() + ": inizialitation...");
-		
+
 		// DF Registration
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
 		sd.setType("teleporting_agent");
-		sd.setName("");
+		sd.setName("teleport");
 		dfd.addServices(sd);
 		try {
 			DFService.register(this, dfd);
@@ -27,7 +33,12 @@ public class Teleporter extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-		System.out.println(this.getLocalName() + ": registered...");
+		
+		System.out.println(this.getLocalName() + ": registered.");
+		
+		this.addBehaviour(new SearchNewHome(this));
+		this.addBehaviour(new Listen());
+		
 		
 		Object[] args = this.getArguments();
 		if (args != null & args.length > 0 ) { 
@@ -41,6 +52,7 @@ public class Teleporter extends Agent {
 			}
 		}
 		
+		
 	}
 	
 	protected void takeDown() {
@@ -52,6 +64,6 @@ public class Teleporter extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
-			System.out.println("Seller-agent"+getAID().getName()+"terminating");
+			System.out.println(getAID().getName()+"terminating");
 		}
 }

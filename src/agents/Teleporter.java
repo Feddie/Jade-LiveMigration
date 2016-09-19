@@ -18,7 +18,7 @@ public class Teleporter extends Agent {
 	public AID[] migr_sites;
 	
 	protected void setup() {
-		System.out.println(this.getLocalName() + ": inizialitation...");
+		System.out.println(this.getLocalName() + ": initialization...");
 
 		// DF Registration
 		DFAgentDescription dfd = new DFAgentDescription();
@@ -36,22 +36,23 @@ public class Teleporter extends Agent {
 		
 		System.out.println(this.getLocalName() + ": registered.");
 		
-		this.addBehaviour(new SearchNewHome(this));
+		//
 		this.addBehaviour(new Listen());
 		
+		///// TODO: add a ticker Behaviour that periodically checks CPU load. When too high, it adds a SearchHome bahav.
+		//this.addBehaviour(new SearchNewHome(this));
 		
 		Object[] args = this.getArguments();
 		if (args != null & args.length > 0 ) { 
 			if (args[0].toString().equals("out")) {	
-			
-				this.addBehaviour(new MigrateOut(this, "Pepper2", "169.254.244.235"));
+				this.addBehaviour(new SearchNewHome(this));
+				
 			}
 			else if (args[0].toString().equals("in")) {	
 			
 			//this.addBehaviour(new MigrateIn(this, "Pepper2", "169.254.244.235"));
 			}
 		}
-		
 		
 	}
 	

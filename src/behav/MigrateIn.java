@@ -1,21 +1,27 @@
 package behav;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
+import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
 
 public class MigrateIn extends OneShotBehaviour {
-	private String ip;
+	//private String ip;
 	private final String port_num;
 	String vm;
+	String myIP;
+	AID requester;
 	
-	public MigrateIn (Agent a, String VMname) {
+	public MigrateIn (Agent a, String VMname, AID req) {
 		super(a);
 		//this.ip = IP_Address;
 		this.vm = VMname;
 		this.port_num = "6000";
+		this.requester = req;
 	}
 	
 	public void action() {	
@@ -32,10 +38,18 @@ public class MigrateIn extends OneShotBehaviour {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		try {
+			this.myIP = InetAddress.getLocalHost().getHostAddress().toString();
+		} catch (UnknownHostException uh) {
+			uh.printStackTrace();
+			
+		}
+		//Inform source host that teleporting is ready here on destination
+		ACLMessage inform_ready = new ACLMessage(ACLMessage.AGREE);
+		inform_ready.addReceiver(requester);
+		inform_ready.setContent(this.myIP);
 		
-		ACLMessage inform_telinit = new ACLMessage(ACLMessage.INFORM);
-		inform_telinit.setContent("Teleporting on destination started");
-		
+		this.myAgent.send(inform_ready);
 	}
 
 	

@@ -8,33 +8,34 @@ import java.io.IOException;;
 
 public class MigrateOut extends OneShotBehaviour {
 	
-	private String ip;
-	private final String port_num;
 	String vm;
+	private String TargetIp;
+	private final String port_num;
 	
-	public MigrateOut (Agent a, String VMname, String IP_Address) {
+	
+	public MigrateOut (Agent a, String VMname, String Ip) {
 		super(a);
-		this.ip = IP_Address;
 		this.vm = VMname;
+		this.TargetIp = Ip;
 		this.port_num = "6000";
 	}
 	
 	public void action() {	
-		//!!!! VM must be already running
 		
-		ACLMessage dest_msg = myAgent.receive();
-		
-		if (dest_msg!= null & dest_msg.getContent().equals("Teleporting on destination started")) {
-			ProcessBuilder pb = new ProcessBuilder("VBoxManage", "controlvm", vm, "teleport", "--host", ip, "--port", port_num);
+			//start VM on source //!!!! OR IT SHOULD BE ALREADY RUNNING
+			ProcessBuilder svm = new ProcessBuilder("VBoxManage", "startvm", vm);
+			try {
+				Process process_start  = svm.start();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			ProcessBuilder pb = new ProcessBuilder("VBoxManage", "controlvm", vm, "teleport", "--host", this.TargetIp, "--port", port_num);
 			try {
 				Process process = pb.start();
-				System.out.println("teleport in progress from source");
+				System.out.println("teleport in progress from source to host " + this.TargetIp);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		else {
-			block();
-		}
-	}
 }
+

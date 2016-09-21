@@ -4,7 +4,7 @@ import java.util.Iterator;
 import org.virtualbox_5_0.*;
 
 import behav.*;
-
+import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -12,6 +12,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.JADEAgentManagement.QueryPlatformLocationsAction;
 
 public class Teleporter extends Agent {
 	
@@ -36,10 +37,10 @@ public class Teleporter extends Agent {
 		
 		System.out.println(this.getLocalName() + ": registered.");
 		
-		//
-		this.addBehaviour(new Listen());
 		
-		///// TODO: add a ticker Behaviour that periodically checks CPU load. When too high, it adds a SearchHome bahav.
+		this.addBehaviour(new Listen());
+		///// TODO: LoadMonitor should periodically checks CPU load. When too high, it adds a SearchHome behav
+		this.addBehaviour(new LoadMonitor(this, 5000));
 		//this.addBehaviour(new SearchNewHome(this));
 		
 		Object[] args = this.getArguments();

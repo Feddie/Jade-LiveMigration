@@ -1,6 +1,8 @@
 package behav;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import behav.MigrateOut;
 import jade.domain.DFService;
@@ -15,14 +17,18 @@ import jade.core.Agent;
 import jade.core.behaviours.*;
 
 public class SearchNewHome extends OneShotBehaviour {
+	CopyOnWriteArrayList migr_sites;
+	Iterator<AID> ms;
 	
 	public SearchNewHome (Agent a) {
 		super(a);
+		this.migr_sites = new CopyOnWriteArrayList();
+		//this.migr_sites = new ArrayList();
+		
 	}
 	
 	public void action() {
-		//List migr_sites;
-		//Iterator<List> = new IterSit<migr_sites>;
+		
 		
 		//create a template to be searched in the DF in order to find an agent available for teleporting
 		DFAgentDescription template = new DFAgentDescription();
@@ -31,24 +37,28 @@ public class SearchNewHome extends OneShotBehaviour {
   		template.addServices(templateSd);
 		try {
 				DFAgentDescription[] result = DFService.search(myAgent, template);
+				//AID[] migr_sites = new AID[result.length]; //agents available for teleporting
 				
-				AID[] migr_sites = new AID[result.length]; //agents available for teleporting
-				System.out.println(result.length + " migration sites found by " + myAgent.getName());
 				for (int i = 0; i < result.length; ++i) {
-					migr_sites[i] = result[i].getName();
-					//migr_sites.add(result[i].getName());
-					//System.out.println(migr_sites[i].toString());
+					if (!result[i].getName().equals(this.myAgent.getAID())) {
+						this.migr_sites.add(result[i].getName());
+					}
 				}
 				
-				if (migr_sites.length != 0) { 
+				if (!this.migr_sites.isEmpty()) { 
+					System.out.println(this.migr_sites.size() + " migration site(s) found by " + myAgent.getName());
 					ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
 					request.setContent("migrate");
-					//System.out.println("req " + request);
-					for (int i = 0; i < migr_sites.length; i++) {
-							System.out.println(this.myAgent.getLocalName() + ": migration service offered by " + migr_sites[i].getName());
-							request.addReceiver(migr_sites[i]);
+					this.ms = migr_sites.iterator();
+					while (ms.hasNext()) {
+							AID site = ms.next();
+							System.out.println(this.myAgent.getLocalName() + ": migration service offered by " + site.toString());
+							request.addReceiver(site);
 					}
 					this.myAgent.send(request);
+				}
+				else {
+					System.out.println("No migration sites found by " + myAgent.getName());
 				}
 		}
 		catch (FIPAException fe) {

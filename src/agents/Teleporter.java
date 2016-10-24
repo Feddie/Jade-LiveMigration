@@ -13,6 +13,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.JADEAgentManagement.QueryPlatformLocationsAction;
+import utils.VBoxInterface;
 
 public class Teleporter extends Agent {
 	
@@ -20,7 +21,7 @@ public class Teleporter extends Agent {
 	
 	protected void setup() {
 		System.out.println(this.getLocalName() + ": initialization...");
-
+		VBoxInterface deds = VBoxInterface.getInstance();
 		// DF Registration
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
@@ -40,7 +41,7 @@ public class Teleporter extends Agent {
 		
 		this.addBehaviour(new Listen());
 		///// TODO: LoadMonitor should periodically checks CPU load. When too high, it adds a SearchHome behav
-		this.addBehaviour(new LoadMonitor(this, 5000));
+		//this.addBehaviour(new LoadMonitor(this, 5000));
 		this.addBehaviour(new SearchNewHome(this));
 		
 		Object[] args = this.getArguments();

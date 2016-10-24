@@ -31,13 +31,13 @@ public class Listen extends CyclicBehaviour{
 			*/
 			System.out.println("Teleport from " + sender.getName() + " to " + this.myAgent.getName() + " accepted.");
 			
-			this.myAgent.addBehaviour(new MigrateIn(this.myAgent, "Ubu", sender));
+			this.myAgent.addBehaviour(new MigrateIn(this.myAgent, "PepperMinOS", sender));
 		
 			}
 			
 			else if (msg.getPerformative() == ACLMessage.AGREE) {
 				String IpTarget = msg.getContent();
-				this.myAgent.addBehaviour(new MigrateOut(this.myAgent, "Ubu32", IpTarget));
+				this.myAgent.addBehaviour(new MigrateOut(this.myAgent, "PepperMinOSs", IpTarget));
 			}
 		}	
 		else {

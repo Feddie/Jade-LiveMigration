@@ -3,6 +3,7 @@ package utils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.lang.ProcessBuilder;
 
 import org.virtualbox_5_0.*;
 
@@ -12,8 +13,8 @@ public class VBoxInterface {
 	private static VBoxInterface instance = null;
 	private VirtualBoxManager vboxm= null;
 	final String url= "http://localhost:18083";
-	String username = null;
-	String password = null;
+	String username = "";
+	String password = "";
 	
 	   protected VBoxInterface() {
 		   setupInterface();
@@ -29,7 +30,7 @@ public class VBoxInterface {
 
 	   private void setupInterface(){
 
-		   ProcessBuilder pb = new ProcessBuilder("vboxwebsr", "-b", "-t", "0",  "-port", "18083");
+		   ProcessBuilder pb = new ProcessBuilder("vboxwebsrv", "-t", "0",  "--port", "18083");
 			try {
 				Process process = pb.start();
 				System.out.println("VirtualBox server initialized");
@@ -39,6 +40,14 @@ public class VBoxInterface {
 	    
 	   
 	   vboxm = VirtualBoxManager.createInstance(null);
+		  ProcessBuilder pc = new ProcessBuilder("VBoxManage", "setproperty", "websrvauthlibrary",  "null");
+			try {
+				Process process = pc.start();
+				System.out.println("Automatic Log On OK");
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("Something went wrong changing authentication properties");
+			}
        boolean ws = true;
 
        if (ws)
@@ -50,6 +59,9 @@ public class VBoxInterface {
                System.out.println("Cannot connect, start webserver first!");
            }
        } 
+       //TEST!!!
+       IVirtualBox vbox = vboxm.getVBox();
+       this.testStart(vboxm, vbox);
        }
 	      
 	   static void processEvent(IEvent ev)

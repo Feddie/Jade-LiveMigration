@@ -62,8 +62,10 @@ public class VBoxInterface {
        //TEST!!!
        IVirtualBox vbox = vboxm.getVBox();
        this.testStart(vboxm, vbox);
-       }
-	      
+       
+	   this.testTeleporting(vboxm);   
+	   }
+	   
 	   static void processEvent(IEvent ev)
 	    {
 	        System.out.println("got event: " + ev);
@@ -180,7 +182,7 @@ public class VBoxInterface {
 
 	    static void testStart(VirtualBoxManager mgr, IVirtualBox vbox)
 	    {
-	        IMachine m = vbox.getMachines().get(0);
+	        IMachine m = vbox.getMachines().get(2);
 	        String name = m.getName();
 	        System.out.println("\nAttempting to start VM '" + name + "'");
 	        
@@ -191,7 +193,14 @@ public class VBoxInterface {
 	        // process system event queue
 	        mgr.waitForEvents(0);
 	    }
-
+	    
+	    static void testTeleporting(VirtualBoxManager mgr) {
+	    	 ISession session = mgr.getSessionObject();
+	    	 IConsole console=session.getConsole();
+	    	 console.teleport("169.254.254.176", (long)6000, "", (long)500);
+	    	 
+	    }
+	    
 	    /*static void testMultiServer()
 	    {
 	        VirtualBoxManager mgr1 = VirtualBoxManager.createInstance(null);
@@ -335,4 +344,14 @@ public class VBoxInterface {
 
 	    }
 
+	    void enableTelep(IMachine m) {
+	    	m.setTeleporterEnabled(true);
+	    	m.setTeleporterPort((long)6000);
+	    }
+	    
+	    void teleport(IMachine m, VirtualBoxManager mgr, String DestIP) {
+	    	ISession session = mgr.getSessionObject();
+	    	IConsole console=session.getConsole();
+	    	console.teleport(DestIP, (long)6000, "", (long)500);
+	    }
 }

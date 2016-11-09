@@ -1,7 +1,7 @@
 package agents;
 
-import java.util.Iterator;
-//import org.virtualbox_5_0.*;
+import java.util.*;
+import org.virtualbox_5_0.*;
 
 import behav.*;
 import jade.content.onto.basic.Action;
@@ -38,7 +38,11 @@ public class Teleporter extends Agent {
 		
 		System.out.println(this.getLocalName() + ": registered.");
 		
-		
+		List <IMachine> runvms= deds.getRunningMachines();
+		for (IMachine m : runvms){
+			
+			System.out.println("VM name: " + m.getName());
+		}
 		this.addBehaviour(new Listen());
 		///// TODO: LoadMonitor should periodically checks CPU load. When too high, it adds a SearchHome behav
 		//this.addBehaviour(new LoadMonitor(this, 5000));

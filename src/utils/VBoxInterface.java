@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.lang.ProcessBuilder;
@@ -16,9 +17,9 @@ public class VBoxInterface {
 	String username = "";
 	String password = "";
 	
+	
 	   protected VBoxInterface() {
-		   setupInterface();
-		   
+		   setupInterface();   
 	   }
 	   
 	   public static VBoxInterface getInstance() {
@@ -48,22 +49,17 @@ public class VBoxInterface {
 				e.printStackTrace();
 				System.out.println("Something went wrong changing authentication properties");
 			}
-       boolean ws = true;
-
-       if (ws)
-       {
-           try {
+          try {
                vboxm.connect(url, username, password);
            } catch (VBoxException e) {
                e.printStackTrace();
                System.out.println("Cannot connect, start webserver first!");
            }
-       } 
+        
        //TEST!!!
        IVirtualBox vbox = vboxm.getVBox();
-       this.testStart(vboxm, vbox);
-       
-	   this.testTeleporting(vboxm);   
+       //this.testStart(vboxm, vbox);
+	   //this.testTeleporting(vboxm);   
 	   }
 	   
 	   static void processEvent(IEvent ev)
@@ -127,12 +123,29 @@ public class VBoxInterface {
 	        es.unregisterListener(listener);
 	    }
 
+	     public List <IMachine> getRunningMachines(){
+	    	List <IMachine> running_machs = new ArrayList<IMachine>();
+	    	List <IMachine> machs = this.vboxm.getVBox().getMachines();
+	    	MachineState state;
+	    	
+	        for (IMachine m : machs){
+		        state = m.getState();
+		        
+		        if (state == MachineState.Running) {
+            	running_machs.add(m);
+		        }
+	        }
+	    	return running_machs;
+	    }
+
+	    
 	    static void testEnumeration(VirtualBoxManager mgr, IVirtualBox vbox)
-	    {
+	    {	
 	        List <IMachine> machs = vbox.getMachines();
 	        for (IMachine m : machs)
 	        {
 	            String name;
+	            MachineState state;
 	            Long ram = 0L;
 	            boolean hwvirtEnabled = false, hwvirtNestedPaging = false;
 	            boolean paeEnabled = false;
@@ -141,6 +154,8 @@ public class VBoxInterface {
 	            {
 	                name = m.getName();
 	                ram = m.getMemorySize();
+	                state = m.getState();
+	                
 	                hwvirtEnabled = m.getHWVirtExProperty(HWVirtExPropertyType.Enabled);
 	                hwvirtNestedPaging = m.getHWVirtExProperty(HWVirtExPropertyType.NestedPaging);
 	                paeEnabled = m.getCPUProperty(CPUPropertyType.PAE);
@@ -267,7 +282,7 @@ public class VBoxInterface {
 	    }
 
 
-	    public static void main(String[] args)
+	    /*public static void main(String[] args)
 	    {
 	        VirtualBoxManager mgr = VirtualBoxManager.createInstance(null);
 
@@ -343,7 +358,7 @@ public class VBoxInterface {
 	        mgr.cleanup();
 
 	    }
-
+	    */
 	    void enableTelep(IMachine m) {
 	    	m.setTeleporterEnabled(true);
 	    	m.setTeleporterPort((long)6000);

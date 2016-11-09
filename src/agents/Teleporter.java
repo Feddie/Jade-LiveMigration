@@ -7,6 +7,8 @@ import behav.*;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.AgentContainer;
+import jade.core.Location;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
 import jade.domain.FIPAException;
@@ -18,6 +20,7 @@ import utils.VBoxInterface;
 public class Teleporter extends Agent {
 	
 	public AID[] migr_sites;
+	public List <IMachine> runvms;
 	
 	protected void setup() {
 		System.out.println(this.getLocalName() + ": initialization...");
@@ -38,16 +41,20 @@ public class Teleporter extends Agent {
 		
 		System.out.println(this.getLocalName() + ": registered.");
 		
-		List <IMachine> runvms= deds.getRunningMachines();
+		Location l = this.here();
+		System.out.println(l.getAddress());
+		
+		this.runvms= deds.getRunningMachines();
 		for (IMachine m : runvms){
 			
 			System.out.println("VM name: " + m.getName());
 		}
 		this.addBehaviour(new Listen());
 		///// TODO: LoadMonitor should periodically checks CPU load. When too high, it adds a SearchHome behav
-		//this.addBehaviour(new LoadMonitor(this, 5000));
-		this.addBehaviour(new SearchNewHome(this));
+		this.addBehaviour(new LoadMonitor(this, 5000, dfd));
+		//this.addBehaviour(new SearchNewHome(this));
 		
+		/*
 		Object[] args = this.getArguments();
 		if (args != null & args.length > 0 ) { 
 			if (args[0].toString().equals("out")) {	
@@ -58,8 +65,12 @@ public class Teleporter extends Agent {
 			
 			//this.addBehaviour(new MigrateIn(this, "Pepper2", "169.254.244.235"));
 			}
-		}
+		}*/
 		
+	}
+	
+	public List<IMachine> getRunVMs() {
+		return this.runvms;
 	}
 	
 	protected void takeDown() {

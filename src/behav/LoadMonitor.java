@@ -2,22 +2,35 @@ package behav;
 
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAException;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import agents.Teleporter;
+
+import org.virtualbox_5_0.*;
 import java.lang.management.ManagementFactory;
 //import java.lang.management.OperatingSystemMXBean;
 import com.sun.management.OperatingSystemMXBean;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 
 public class LoadMonitor extends TickerBehaviour {
 	double cpuload;
 	OperatingSystemMXBean OsB = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
-
+	DFAgentDescription df;
 	//OperatingSystemMXBean OsB = ManagementFactory.OperatingSystemMXBean;
 	String hostname;
 	
-	public LoadMonitor(Agent a, long period ) {
+	public LoadMonitor(Agent a, long period, DFAgentDescription dfad) {
 		super(a,period);
+		this.df = dfad;
+		ServiceDescription sd = new ServiceDescription();
+		sd.setType("teleporting_agent");
+		sd.setName("teleport");
+		df.addServices(sd);
 		try {
 			this.hostname = InetAddress.getLocalHost().getHostName().toString();
 		} catch (UnknownHostException unknownhost) {
@@ -32,14 +45,29 @@ public class LoadMonitor extends TickerBehaviour {
 		}
 		else {
 			System.out.println("Current CPU load on " + hostname +": " + this.cpuload);
-			if (this.cpuload >= 0.8) {
-				this.myAgent.addBehaviour(new SearchNewHome(this.myAgent));
-			}
-			else if (this.cpuload >= 0.6) {
-				//TODO: de-register as available migration site
+			if (this.cpuload >= 0.6) {
+				try {
+					DFService.deregister(this.myAgent, this.df);
+					System.out.println(this.myAgent.getName() + " has unregistered from DF");
+				}
+				catch (FIPAException fe) {
+					fe.printStackTrace();
+				}
+				if (this.cpuload > 0.8) {	
+					List <IMachine> vms = ((Teleporter) myAgent).getRunVMs();
+					String first_vm = vms.get(0).getId();
+					this.myAgent.addBehaviour(new SearchNewHome(this.myAgent, first_vm));
+				}
 			}
 			else {
-				//TODO: register
+				try {
+					
+					DFService.register(this.myAgent, this.df);
+					System.out.println(this.myAgent.getName() + " has registered on DF");
+				}
+				catch (FIPAException fe) {
+					fe.printStackTrace();
+				}
 			}
 		}
 		

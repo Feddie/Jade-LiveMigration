@@ -3,7 +3,9 @@ package behav;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import org.virtualbox_5_0.*;
 
+import utils.VBoxInterface;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
@@ -25,6 +27,7 @@ public class MigrateIn extends OneShotBehaviour {
 	}
 	
 	public void action() {	
+		/*
 		ProcessBuilder pb = new ProcessBuilder("VBoxManage", "modifyvm", vm, "--teleporter", "on", "--teleporterport", port_num);
 		try {
 			Process process_init = pb.start();
@@ -38,7 +41,14 @@ public class MigrateIn extends OneShotBehaviour {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		*/
+		
+		//Enable Teleporting on this host
+		IMachine vm = VBoxInterface.getInstance().getMachinebyUUID(this.vm);
+		VBoxInterface.getInstance().enableTelep(vm);
+		
 		try {
+			//Get Host IP
 			this.myIP = InetAddress.getLocalHost().getHostAddress().toString();
 		} catch (UnknownHostException uh) {
 			uh.printStackTrace();
@@ -47,7 +57,8 @@ public class MigrateIn extends OneShotBehaviour {
 		//Inform source host that teleporting is ready here on destination
 		ACLMessage inform_ready = new ACLMessage(ACLMessage.AGREE);
 		inform_ready.addReceiver(requester);
-		inform_ready.setContent(this.myIP);
+		String content = this.myIP + ":" + this.vm;
+		inform_ready.setContent(content);
 		
 		this.myAgent.send(inform_ready);
 	}

@@ -3,8 +3,11 @@ package behav;
 import jade.core.Agent;
 import jade.core.behaviours.OneShotBehaviour;
 import jade.lang.acl.ACLMessage;
+import utils.VBoxInterface;
 
-import java.io.IOException;;
+import java.io.IOException;
+
+import org.virtualbox_5_0.IMachine;;
 
 public class MigrateOut extends OneShotBehaviour {
 	
@@ -23,6 +26,7 @@ public class MigrateOut extends OneShotBehaviour {
 	public void action() {	
 		
 			//start VM on source //!!!! OR IT SHOULD BE ALREADY RUNNING
+			/*
 			ProcessBuilder svm = new ProcessBuilder("VBoxManage", "startvm", vm);
 			try {
 				Process process_start  = svm.start();
@@ -36,6 +40,10 @@ public class MigrateOut extends OneShotBehaviour {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			*/
+			IMachine machine = VBoxInterface.getInstance().getMachinebyUUID(this.vm);
+			VBoxInterface.getInstance().teleport(machine, this.TargetIp);
+			System.out.println(this.myAgent.getName() +" Teleported " + this.vm + " to " + this.TargetIp);
 		}
 }
 

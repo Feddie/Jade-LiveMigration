@@ -359,12 +359,18 @@ public class VBoxInterface {
 
 	    }
 	    */
-	    void enableTelep(IMachine m) {
+	    
+	    public IMachine getMachinebyUUID(String vmname) {
+	    	return this.vboxm.getVBox().findMachine(vmname);
+	    }
+	    
+	    public void enableTelep(IMachine m) {
 	    	m.setTeleporterEnabled(true);
 	    	m.setTeleporterPort((long)6000);
 	    }
 	    
-	    void teleport(IMachine m, VirtualBoxManager mgr, String DestIP) {
+	    public void teleport(IMachine m, String DestIP) {
+	    	VirtualBoxManager mgr = this.vboxm;
 	    	ISession session = mgr.getSessionObject();
 	    	IConsole console=session.getConsole();
 	    	console.teleport(DestIP, (long)6000, "", (long)500);

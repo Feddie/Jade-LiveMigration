@@ -16,7 +16,7 @@ public class Listen extends CyclicBehaviour{
 		
 		if (msg != null && !msg.getSender().equals(this.myAgent.getAID())) {
 			
-			if (msg.getPerformative() == ACLMessage.REQUEST & msg.getContent().equals("migrate")) {
+			if (msg.getPerformative() == ACLMessage.REQUEST & msg.getContent().contains("migrate")) {
 			AID sender = msg.getSender();
 		
 			System.out.println(this.myAgent.getName() + " received a message (" + msg.getContent() + ") from " + sender.getName());
@@ -31,13 +31,17 @@ public class Listen extends CyclicBehaviour{
 			*/
 			System.out.println("Teleport from " + sender.getName() + " to " + this.myAgent.getName() + " accepted.");
 			
-			this.myAgent.addBehaviour(new MigrateIn(this.myAgent, "PepperMinOS", sender));
+			String vm_name = msg.getContent().split(":")[1];
+			System.out.println("Migrating " + vm_name);
+			this.myAgent.addBehaviour(new MigrateIn(this.myAgent, vm_name, sender));
 		
 			}
 			
 			else if (msg.getPerformative() == ACLMessage.AGREE) {
-				String IpTarget = msg.getContent();
-				this.myAgent.addBehaviour(new MigrateOut(this.myAgent, "PepperMinOSs", IpTarget));
+				
+				String IpTarget = msg.getContent().split(":")[0];
+				String vmname = msg.getContent().split(":")[1];
+				this.myAgent.addBehaviour(new MigrateOut(this.myAgent, vmname, IpTarget));
 			}
 		}	
 		else {

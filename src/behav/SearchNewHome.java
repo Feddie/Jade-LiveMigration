@@ -3,6 +3,7 @@ package behav;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
+import org.virtualbox_5_0.*;
 
 import behav.MigrateOut;
 import jade.domain.DFService;
@@ -12,6 +13,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.ArrayList;
 import jade.util.leap.List;
+//import jade.util.*;//.leap.List;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.*;
@@ -19,16 +21,18 @@ import jade.core.behaviours.*;
 public class SearchNewHome extends OneShotBehaviour {
 	CopyOnWriteArrayList migr_sites;
 	Iterator<AID> ms;
+	String migr_vm;
 	
-	public SearchNewHome (Agent a) {
+	public SearchNewHome (Agent a, String vm_id) {
 		super(a);
+		this.migr_vm = vm_id;
 		this.migr_sites = new CopyOnWriteArrayList();
+		
 		//this.migr_sites = new ArrayList();
 		
 	}
 	
 	public void action() {
-		
 		
 		//create a template to be searched in the DF in order to find an agent available for teleporting
 		DFAgentDescription template = new DFAgentDescription();
@@ -44,11 +48,11 @@ public class SearchNewHome extends OneShotBehaviour {
 						this.migr_sites.add(result[i].getName());
 					}
 				}
-				
 				if (!this.migr_sites.isEmpty()) { 
 					System.out.println(this.migr_sites.size() + " migration site(s) found by " + myAgent.getName());
 					ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
-					request.setContent("migrate");
+					
+					request.setContent("migrate:"+ this.migr_vm);
 					this.ms = migr_sites.iterator();
 					while (ms.hasNext()) {
 							AID site = ms.next();

@@ -19,7 +19,7 @@ import utils.VBoxInterface;
 
 public class Teleporter extends Agent {
 	
-	public AID[] migr_sites;
+	//public AID[] migr_sites;
 	public List <IMachine> runvms;
 	
 	protected void setup() {

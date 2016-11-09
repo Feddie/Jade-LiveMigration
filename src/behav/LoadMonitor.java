@@ -46,13 +46,32 @@ public class LoadMonitor extends TickerBehaviour {
 		else {
 			System.out.println("Current CPU load on " + hostname +": " + this.cpuload);
 			if (this.cpuload >= 0.6) {
-				try {
-					DFService.deregister(this.myAgent, this.df);
-					System.out.println(this.myAgent.getName() + " has unregistered from DF");
-				}
-				catch (FIPAException fe) {
+				boolean registered = false;
+				DFAgentDescription template = new DFAgentDescription();
+		  		ServiceDescription templateSd = new ServiceDescription();
+		  		templateSd.setType("teleporting_agent");
+		  		template.addServices(templateSd);
+		  		try {
+		  			DFAgentDescription[] dfd = DFService.search(this.myAgent, template);
+		  			for (DFAgentDescription df : dfd) {
+		  				if (df.getName() == this.myAgent.getAID()) {
+		  					registered = true;
+		  				}		
+		  			}
+		  			if (registered) {
+			  			try {
+							DFService.deregister(this.myAgent, this.df);
+							System.out.println(this.myAgent.getName() + " has unregistered from DF");
+						}
+						catch (FIPAException fe) {
+							fe.printStackTrace();
+						}
+		  			}
+		  		}
+		  		catch (FIPAException fe) {
 					fe.printStackTrace();
 				}
+				
 				if (this.cpuload > 0.8) {	
 					List <IMachine> vms = ((Teleporter) myAgent).getRunVMs();
 					String first_vm = vms.get(0).getId();

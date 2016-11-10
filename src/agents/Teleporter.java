@@ -23,9 +23,10 @@ public class Teleporter extends Agent {
 	public List <IMachine> runvms;
 	
 	protected void setup() {
-		System.out.println(this.getLocalName() + ": initialization...");
+		System.out.println(this.getName() + ": initialization...");
 		VBoxInterface deds = VBoxInterface.getInstance();
 		// DF Registration
+		/*
 		DFAgentDescription dfd = new DFAgentDescription();
 		dfd.setName(getAID());
 		ServiceDescription sd = new ServiceDescription();
@@ -38,21 +39,14 @@ public class Teleporter extends Agent {
 		catch (FIPAException fe) {
 			fe.printStackTrace();
 		}
+		*/
 		
-		System.out.println(this.getLocalName() + ": registered.");
+
 		
-		Location l = this.here();
-		System.out.println(l.getAddress());
-		
-		this.runvms= deds.getRunningMachines();
-		for (IMachine m : runvms){
-			
-			System.out.println("VM name: " + m.getName());
-		}
+		//Listen behav performs a non-blocking receive and discriminates migration messages from other hosts
 		this.addBehaviour(new Listen());
-		///// TODO: LoadMonitor should periodically checks CPU load. When too high, it adds a SearchHome behav
-		this.addBehaviour(new LoadMonitor(this, 5000, dfd));
-		//this.addBehaviour(new SearchNewHome(this));
+		// LoadMonitor periodically checks CPU load. When too high, it schedules a SearchHome behav for migration
+		this.addBehaviour(new LoadMonitor(this, 5000));
 		
 		/*
 		Object[] args = this.getArguments();

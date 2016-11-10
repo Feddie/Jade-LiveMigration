@@ -6,6 +6,7 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
+import utils.VBoxInterface;
 import agents.Teleporter;
 
 import org.virtualbox_5_0.*;
@@ -18,71 +19,78 @@ import java.util.List;
 
 
 public class LoadMonitor extends TickerBehaviour {
+	public static final double REG_THR = 0.4; //CPUload threshold for DF registration
+	public static final double MIGR_THR = 0.7; //CPUload threshold for agent migration
 	double cpuload;
+	List <IMachine> runvms;
+	boolean registered;
+	DFAgentDescription ag_desc;
+	ServiceDescription serv_desc;
 	OperatingSystemMXBean OsB = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
-	DFAgentDescription df;
-	//OperatingSystemMXBean OsB = ManagementFactory.OperatingSystemMXBean;
 	String hostname;
 	
-	public LoadMonitor(Agent a, long period, DFAgentDescription dfad) {
+	
+	public LoadMonitor(Agent a, long period) {
 		super(a,period);
-		this.df = dfad;
-		ServiceDescription sd = new ServiceDescription();
-		sd.setType("teleporting_agent");
-		sd.setName("teleport");
-		df.addServices(sd);
+		this.ag_desc = new DFAgentDescription();
+		this.serv_desc = new ServiceDescription();
+		this.serv_desc.setType("teleporting_agent");
+		this.serv_desc.setName("teleport");
+		ag_desc.addServices(serv_desc);
+		this.registered = true;
 		try {
-			this.hostname = InetAddress.getLocalHost().getHostName().toString();
+			//this.hostname = InetAddress.getLocalHost().getHostName().toString();
+			this.hostname = InetAddress.getLocalHost().toString();
 		} catch (UnknownHostException unknownhost) {
 			unknownhost.printStackTrace();
 		}
 	}
 	
 	public void onTick() {
+		//Prints VMs running on this host ///NOTE: could also use a different TickerBehav with a larger period
+		runvms = VBoxInterface.getInstance().getRunningMachines();
+		if (runvms.size() != 0) {
+			System.out.print("VMs running on " + hostname + " : ");
+			for (IMachine m : runvms){
+				System.out.print(" " + m.getName() + " ");
+			}
+			System.out.println();
+		}
+		
+		
 		this.cpuload = this.OsB.getSystemCpuLoad();
-		if (cpuload == -1.0) {
+		if (cpuload == -1.0) { //error in reading CPU Load
 			System.out.println("CPU Load unavailable on " + hostname);
 		}
 		else {
 			System.out.println("Current CPU load on " + hostname +": " + this.cpuload);
-			if (this.cpuload >= 0.6) {
-				boolean registered = false;
-				DFAgentDescription template = new DFAgentDescription();
-		  		ServiceDescription templateSd = new ServiceDescription();
-		  		templateSd.setType("teleporting_agent");
-		  		template.addServices(templateSd);
-		  		try {
-		  			DFAgentDescription[] dfd = DFService.search(this.myAgent, template);
-		  			for (DFAgentDescription df : dfd) {
-		  				if (df.getName() == this.myAgent.getAID()) {
-		  					registered = true;
-		  				}		
-		  			}
-		  			if (registered) {
+			
+			if (this.cpuload >= this.REG_THR) { //Deregister from DF as a migration site	
+		  		checkRegistration();	
+				if (registered) {
 			  			try {
-							DFService.deregister(this.myAgent, this.df);
+							DFService.deregister(this.myAgent, this.ag_desc);
+							this.registered = false;
 							System.out.println(this.myAgent.getName() + " has unregistered from DF");
 						}
 						catch (FIPAException fe) {
 							fe.printStackTrace();
 						}
 		  			}
-		  		}
-		  		catch (FIPAException fe) {
-					fe.printStackTrace();
-				}
-				
-				if (this.cpuload > 0.8) {	
+				if (this.cpuload > this.MIGR_THR) { //with a high CPU load, try to perform a migration
 					List <IMachine> vms = ((Teleporter) myAgent).getRunVMs();
-					String first_vm = vms.get(0).getId();
+					String first_vm = vms.get(0).getHardwareUUID();
 					this.myAgent.addBehaviour(new SearchNewHome(this.myAgent, first_vm));
 				}
 			}
-			else {
+			else { //if CPU load is lower than registration threshold, register as a migration agent
 				try {
-					
-					DFService.register(this.myAgent, this.df);
-					System.out.println(this.myAgent.getName() + " has registered on DF");
+					checkRegistration();
+					if (!registered) {
+						DFService.register(this.myAgent, this.ag_desc);
+						this.registered = true;
+						System.out.println(this.myAgent.getName() + " has registered on DF");
+					}
 				}
 				catch (FIPAException fe) {
 					fe.printStackTrace();
@@ -91,4 +99,24 @@ public class LoadMonitor extends TickerBehaviour {
 		}
 		
 	}
+	
+	/*Asks the DF if the current agent is already registered and updates "registered" flag */
+	public void checkRegistration() {
+		this.registered = false;
+		DFAgentDescription template = new DFAgentDescription();
+  		ServiceDescription templateSd = new ServiceDescription();
+  		templateSd.setType("teleporting_agent");
+  		template.addServices(templateSd);
+  		try {
+  			DFAgentDescription[] dfd = DFService.search(this.myAgent, template);
+  			for (DFAgentDescription df : dfd) { 		
+  				if (df.getName().equals( this.myAgent.getAID())) {
+  					this.registered = true;
+  				}
+  			}
+  		}
+	  	catch (FIPAException fe) {
+				fe.printStackTrace();
+			}
+  		}
 }

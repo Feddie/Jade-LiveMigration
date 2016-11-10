@@ -44,7 +44,7 @@ public class VBoxInterface {
 		  ProcessBuilder pc = new ProcessBuilder("VBoxManage", "setproperty", "websrvauthlibrary",  "null");
 			try {
 				Process process = pc.start();
-				System.out.println("Automatic Log On OK");
+				//System.out.println("Automatic Log On OK");
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("Something went wrong changing authentication properties");

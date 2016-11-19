@@ -23,7 +23,7 @@ public class LoadMonitor extends TickerBehaviour {
 	public static final double MIGR_THR = 0.7; //CPUload threshold for agent migration
 	double cpuload;
 	List <IMachine> runvms;
-	boolean registered;
+	public static boolean registered;
 	DFAgentDescription ag_desc;
 	ServiceDescription serv_desc;
 	OperatingSystemMXBean OsB = (com.sun.management.OperatingSystemMXBean)ManagementFactory.getOperatingSystemMXBean();
@@ -37,7 +37,7 @@ public class LoadMonitor extends TickerBehaviour {
 		this.serv_desc.setType("teleporting_agent");
 		this.serv_desc.setName("teleport");
 		ag_desc.addServices(serv_desc);
-		this.registered = true;
+		LoadMonitor.registered = true;
 		try {
 			//this.hostname = InetAddress.getLocalHost().getHostName().toString();
 			this.hostname = InetAddress.getLocalHost().toString();
@@ -65,20 +65,21 @@ public class LoadMonitor extends TickerBehaviour {
 		else {
 			System.out.println("Current CPU load on " + hostname +": " + this.cpuload);
 			
-			if (this.cpuload >= this.REG_THR) { //Deregister from DF as a migration site	
+			if (this.cpuload >= LoadMonitor.REG_THR) { //Deregister from DF as a migration site	
 		  		checkRegistration();	
 				if (registered) {
 			  			try {
 							DFService.deregister(this.myAgent, this.ag_desc);
-							this.registered = false;
+							LoadMonitor.registered = false;
 							System.out.println(this.myAgent.getName() + " has unregistered from DF");
 						}
 						catch (FIPAException fe) {
 							fe.printStackTrace();
 						}
 		  			}
-				if (this.cpuload > this.MIGR_THR) { //with a high CPU load, try to perform a migration
+				if (this.cpuload > LoadMonitor.MIGR_THR) { //with a high CPU load, try to perform a migration
 					List <IMachine> vms = ((Teleporter) myAgent).getRunVMs();
+					System.out.println(vms.get(0));
 					String first_vm = vms.get(0).getHardwareUUID();
 					this.myAgent.addBehaviour(new SearchNewHome(this.myAgent, first_vm));
 				}
@@ -88,7 +89,7 @@ public class LoadMonitor extends TickerBehaviour {
 					checkRegistration();
 					if (!registered) {
 						DFService.register(this.myAgent, this.ag_desc);
-						this.registered = true;
+						LoadMonitor.registered = true;
 						System.out.println(this.myAgent.getName() + " has registered on DF");
 					}
 				}
@@ -102,7 +103,7 @@ public class LoadMonitor extends TickerBehaviour {
 	
 	/*Asks the DF if the current agent is already registered and updates "registered" flag */
 	public void checkRegistration() {
-		this.registered = false;
+		LoadMonitor.registered = false;
 		DFAgentDescription template = new DFAgentDescription();
   		ServiceDescription templateSd = new ServiceDescription();
   		templateSd.setType("teleporting_agent");
@@ -111,7 +112,7 @@ public class LoadMonitor extends TickerBehaviour {
   			DFAgentDescription[] dfd = DFService.search(this.myAgent, template);
   			for (DFAgentDescription df : dfd) { 		
   				if (df.getName().equals( this.myAgent.getAID())) {
-  					this.registered = true;
+  					LoadMonitor.registered = true;
   				}
   			}
   		}

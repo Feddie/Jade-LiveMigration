@@ -67,11 +67,14 @@ public class Teleporter extends Agent {
 		return this.runvms;
 	}
 	
+	
 	protected void takeDown() {
 		
 		// Deregister from DF
 		try {
-			DFService.deregister(this);
+			if (LoadMonitor.registered) {
+				DFService.deregister(this);
+			}
 		}
 		catch (FIPAException fe) {
 			fe.printStackTrace();

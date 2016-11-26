@@ -25,6 +25,7 @@ public class Teleporter extends Agent {
 	protected void setup() {
 		System.out.println(this.getName() + ": initialization...");
 		VBoxInterface deds = VBoxInterface.getInstance();
+		runvms = new ArrayList<IMachine>();
 		// DF Registration
 		/*
 		DFAgentDescription dfd = new DFAgentDescription();

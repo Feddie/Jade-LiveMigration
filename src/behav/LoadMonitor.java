@@ -53,6 +53,7 @@ public class LoadMonitor extends TickerBehaviour {
 			System.out.print("VMs running on " + hostname + " : ");
 			for (IMachine m : runvms){
 				System.out.print(" " + m.getName() + " ");
+				((Teleporter) myAgent).runvms.add(m);
 			}
 			System.out.println();
 		}

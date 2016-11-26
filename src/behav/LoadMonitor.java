@@ -15,14 +15,15 @@ import java.lang.management.ManagementFactory;
 import com.sun.management.OperatingSystemMXBean;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class LoadMonitor extends TickerBehaviour {
-	public static final double REG_THR = 0.4; //CPUload threshold for DF registration
-	public static final double MIGR_THR = 0.5; //CPUload threshold for agent migration
+	public static final double REG_THR = 0.6; //CPUload threshold for DF registration
+	public static final double MIGR_THR = 0.9; //CPUload threshold for agent migration
 	double cpuload;
-	List <IMachine> runvms;
+	List <IMachine> runvms = new ArrayList<IMachine>();
 	public static boolean registered;
 	DFAgentDescription ag_desc;
 	ServiceDescription serv_desc;
@@ -78,11 +79,12 @@ public class LoadMonitor extends TickerBehaviour {
 							fe.printStackTrace();
 						}
 		  			}
-				if (this.cpuload > LoadMonitor.MIGR_THR) { //with a high CPU load, try to perform a migration
-					List <IMachine> vms = ((Teleporter) myAgent).getRunVMs();
-					System.out.println(vms.get(0));
-					String first_vm = vms.get(0).getHardwareUUID();
-					this.myAgent.addBehaviour(new SearchNewHome(this.myAgent, first_vm));
+				if (this.cpuload > LoadMonitor.MIGR_THR) { //with a high CPU load, try to perform a migration	
+					if (!runvms.isEmpty()) { 
+						System.out.println(runvms.get(0));
+						String first_vm = runvms.get(0).getHardwareUUID();
+						this.myAgent.addBehaviour(new SearchNewHome(this.myAgent, first_vm));
+					}
 				}
 			}
 			else { //if CPU load is lower than registration threshold, register as a migration agent

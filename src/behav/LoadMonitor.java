@@ -20,7 +20,7 @@ import java.util.List;
 
 public class LoadMonitor extends TickerBehaviour {
 	public static final double REG_THR = 0.4; //CPUload threshold for DF registration
-	public static final double MIGR_THR = 0.7; //CPUload threshold for agent migration
+	public static final double MIGR_THR = 0.5; //CPUload threshold for agent migration
 	double cpuload;
 	List <IMachine> runvms;
 	public static boolean registered;

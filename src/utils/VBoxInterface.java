@@ -30,8 +30,20 @@ public class VBoxInterface {
 	   }
 
 	   private void setupInterface(){
+		   String vboxwebsrv="vboxwebsrv";
+		   String vboxmanage="VBoxManage";
+		   
+		   if (System.getProperty("os.name").startsWith("Windows")) {
+		        // includes: Windows 2000,  Windows 95, Windows 98, Windows NT, Windows Vista, Windows XP
+		    } else {
+		    	vboxwebsrv = "/usr/local/bin/vboxwebsrv";
+		    	vboxmanage = "/usr/local/bin/VBoxManage";
+		        // everything else
+		    } 
+		   
+		   
 
-		   ProcessBuilder pb = new ProcessBuilder("vboxwebsrv", "-t", "0",  "--port", "18083");
+		   ProcessBuilder pb = new ProcessBuilder(vboxwebsrv, "-t", "0",  "--port", "18083");
 			try {
 				Process process = pb.start();
 				System.out.println("VirtualBox server initialized");
@@ -41,7 +53,7 @@ public class VBoxInterface {
 	    
 	   
 	   vboxm = VirtualBoxManager.createInstance(null);
-		  ProcessBuilder pc = new ProcessBuilder("VBoxManage", "setproperty", "websrvauthlibrary",  "null");
+		  ProcessBuilder pc = new ProcessBuilder(vboxmanage, "setproperty", "websrvauthlibrary",  "null");
 			try {
 				Process process = pc.start();
 				//System.out.println("Automatic Log On OK");

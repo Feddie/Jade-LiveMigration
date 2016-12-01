@@ -45,22 +45,36 @@ public class MigrateIn extends OneShotBehaviour {
 		
 		//Enable Teleporting on this host
 		IMachine vm = VBoxInterface.getInstance().getMachinebyUUID(this.vm);
-		VBoxInterface.getInstance().enableTelep(vm);
+		boolean result = VBoxInterface.getInstance().enableTelep(vm);
 		
-		try {
+		if (result){
+			try {
+			VBoxInterface.getInstance().launchMachine(vm);
 			//Get Host IP
 			this.myIP = InetAddress.getLocalHost().getHostAddress().toString();
 		} catch (UnknownHostException uh) {
 			uh.printStackTrace();
 			
 		}
+		
 		//Inform source host that teleporting is ready here on destination
 		ACLMessage inform_ready = new ACLMessage(ACLMessage.AGREE);
 		inform_ready.addReceiver(requester);
 		String content = this.myIP + ":" + this.vm;
 		inform_ready.setContent(content);
-		
+		// Waiting for machine ready for teleport
+		boolean flag = false;
+		MachineState state;
+		while(!flag){
+			state = vm.getState();
+			if (state == MachineState.TeleportingIn){
+				flag = true; 
+			}
+		}
+		//sending the message
 		this.myAgent.send(inform_ready);
+		
+		}
 	}
 
 	

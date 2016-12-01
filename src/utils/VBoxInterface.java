@@ -390,7 +390,9 @@ public class VBoxInterface {
 	    public void teleport(IMachine m, String DestIP) {
 	    	VirtualBoxManager mgr = this.vboxm;
 	    	ISession session = mgr.getSessionObject();
+	    	m.lockMachine(session, LockType.Write);
 	    	IConsole console=session.getConsole();
 	    	console.teleport(DestIP, (long)6000, "", (long)500);
+	    	session.unlockMachine();
 	    }
 }

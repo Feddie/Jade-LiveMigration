@@ -377,8 +377,14 @@ public class VBoxInterface {
 	    }
 	    
 	    public void enableTelep(IMachine m) {
-	    	m.setTeleporterEnabled(true);
-	    	m.setTeleporterPort((long)6000);
+	    	VirtualBoxManager mgr = this.vboxm;
+	    	ISession sessionin = mgr.getSessionObject();
+	    	m.lockMachine(sessionin, LockType.Write);
+	    	IMachine mutable = sessionin.getMachine();  
+	    	mutable.setTeleporterEnabled(true);
+	    	mutable.setTeleporterPort((long)6000);
+	    	mutable.saveSettings();
+	    	sessionin.unlockMachine();
 	    }
 	    
 	    public void teleport(IMachine m, String DestIP) {

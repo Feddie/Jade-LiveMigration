@@ -379,7 +379,7 @@ public class VBoxInterface {
 	    public void enableTelep(IMachine m) {
 	    	VirtualBoxManager mgr = this.vboxm;
 	    	ISession sessionin = mgr.getSessionObject();
-	    	m.lockMachine(sessionin, LockType.Write);
+	    	m.lockMachine(sessionin, LockType.Shared);
 	    	IMachine mutable = sessionin.getMachine();  
 	    	mutable.setTeleporterEnabled(true);
 	    	mutable.setTeleporterPort((long)6000);
@@ -390,7 +390,7 @@ public class VBoxInterface {
 	    public void teleport(IMachine m, String DestIP) {
 	    	VirtualBoxManager mgr = this.vboxm;
 	    	ISession session = mgr.getSessionObject();
-	    	m.lockMachine(session, LockType.Write);
+	    	m.lockMachine(session, LockType.Shared);
 	    	IConsole console=session.getConsole();
 	    	console.teleport(DestIP, (long)6000, "", (long)500);
 	    	session.unlockMachine();

@@ -388,6 +388,17 @@ public class VBoxInterface {
 	    	return true;
 	    }
 	    
+	    public boolean disableTelep(IMachine m) {
+	    	VirtualBoxManager mgr = this.vboxm;
+	    	ISession sessionin = mgr.getSessionObject();
+	    	m.lockMachine(sessionin, LockType.Shared);
+	    	IMachine mutable = sessionin.getMachine();  
+	    	mutable.setTeleporterEnabled(false);
+	    	mutable.saveSettings();
+	    	sessionin.unlockMachine();
+	    	return true;
+	    }
+	    
 	    public void teleport(IMachine m, String DestIP) {
 	    	VirtualBoxManager mgr = this.vboxm;
 	    	ISession session = mgr.getSessionObject();
@@ -403,8 +414,6 @@ public class VBoxInterface {
 	    	IProgress prog = m.launchVMProcess(sessionlaunch,
 	                "gui",  // session type
 	                "");    // possibly environment setting
-			//prog.waitForCompletion(-1);  // give the process 50 secs
-			//if (prog.getResultCode() != 0)  // check success
-					//System.out.println("Cannot launch VM!");
+			//sessionlaunch.unlockMachine();
 	    }
 }

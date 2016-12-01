@@ -62,7 +62,7 @@ public class MigrateIn extends OneShotBehaviour {
 		inform_ready.addReceiver(requester);
 		String content = this.myIP + ":" + this.vm;
 		inform_ready.setContent(content);
-		// Waiting for machine ready for teleport
+		// Waiting for machine to be ready for teleport
 		boolean flag = false;
 		MachineState state;
 		while(!flag){
@@ -73,6 +73,15 @@ public class MigrateIn extends OneShotBehaviour {
 		}
 		//sending the message
 		this.myAgent.send(inform_ready);
+		
+		boolean EndTelep = false;
+		while(!EndTelep){
+			state = vm.getState();
+			if (state == MachineState.Running){
+				EndTelep = true;
+			}
+		}
+		VBoxInterface.getInstance().disableTelep(vm);
 		
 		}
 	}

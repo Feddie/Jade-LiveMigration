@@ -63,17 +63,18 @@ public class MigrateIn extends OneShotBehaviour {
 		String content = this.myIP + ":" + this.vm;
 		inform_ready.setContent(content);
 		// Waiting for machine to be ready for teleport
-		boolean flag = false;
+		boolean TelepIn = false;
 		MachineState state;
-		while(!flag){
+		while(!TelepIn){
 			state = vm.getState();
 			if (state == MachineState.TeleportingIn){
-				flag = true; 
+				TelepIn = true; 
 			}
 		}
-		//sending the message
+		//sending the AGREE message to teleport source
 		this.myAgent.send(inform_ready);
 		
+		//Wait for machine to end teleport stage 
 		boolean EndTelep = false;
 		while(!EndTelep){
 			state = vm.getState();

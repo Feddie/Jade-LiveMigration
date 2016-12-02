@@ -82,7 +82,7 @@ public class LoadMonitor extends TickerBehaviour {
 				if (this.cpuload > LoadMonitor.MIGR_THR) { //with a high CPU load, try to perform a migration	
 					if (!runvms.isEmpty()) { 
 						System.out.println(runvms.get(0));
-						String first_vm = runvms.get(0).getHardwareUUID();
+						String first_vm = runvms.get(0).getName();
 						this.myAgent.addBehaviour(new SearchNewHome(this.myAgent, first_vm));
 					}
 				}

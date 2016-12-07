@@ -42,8 +42,9 @@ public class MigrateOut extends OneShotBehaviour {
 			}
 			*/
 			IMachine machine = VBoxInterface.getInstance().getMachinebyUUID(this.vm);
-			VBoxInterface.getInstance().teleport(machine, this.TargetIp);
 			
+			VBoxInterface.getInstance().teleport(machine, this.TargetIp);
+			//this.myAgent.doWait(25000);
 			//may want to insert a check for Teleport success
 			System.out.println(this.myAgent.getName() +" Teleported " + this.vm + " to " + this.TargetIp);
 		}

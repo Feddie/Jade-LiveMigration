@@ -20,15 +20,7 @@ public class Listen extends CyclicBehaviour{
 			AID sender = msg.getSender();
 		
 			System.out.println(this.myAgent.getName() + " received a message (" + msg.getContent() + ") from " + sender.getName());
-			
-			//ACLMessage reply = msg.createReply();
-	
-			////////insert control here [whether the migration on the host is accepted or not]
-			/*
-			reply.setPerformative(ACLMessage.AGREE);
-			reply.setContent("Teleport accepted.");
-			this.myAgent.send(reply);
-			*/
+
 			System.out.println("Teleport from " + sender.getName() + " to " + this.myAgent.getName() + " accepted.");
 			
 			String vm_name = msg.getContent().split(":")[1];

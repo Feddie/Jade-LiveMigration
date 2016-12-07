@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import org.virtualbox_5_0.*;
 
+import agents.Teleporter;
 import utils.VBoxInterface;
 import jade.core.AID;
 import jade.core.Agent;
@@ -71,6 +72,10 @@ public class MigrateIn extends OneShotBehaviour {
 				TelepIn = true; 
 			}
 		}
+		
+		this.myAgent.doWait(2000);
+		((Teleporter) myAgent).migrating = true;
+		
 		//sending the AGREE message to teleport source
 		this.myAgent.send(inform_ready);
 		
@@ -78,12 +83,13 @@ public class MigrateIn extends OneShotBehaviour {
 		boolean EndTelep = false;
 		while(!EndTelep){
 			state = vm.getState();
-			if (state == MachineState.Running){
+			if (state != MachineState.TeleportingIn){
 				EndTelep = true;
 			}
 		}
 		VBoxInterface.getInstance().disableTelep(vm);
-		
+		this.myAgent.doWait(2000);
+		((Teleporter) myAgent).migrating = false;
 		}
 	}
 

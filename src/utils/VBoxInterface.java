@@ -378,15 +378,18 @@ public class VBoxInterface {
 	    }
 	    
 	    public boolean enableTelep(IMachine m) {
+	    	boolean telep_enabled;
 	    	VirtualBoxManager mgr = this.vboxm;
 	    	ISession sessionin = mgr.getSessionObject();
 	    	m.lockMachine(sessionin, LockType.Shared);
-	    	IMachine mutable = sessionin.getMachine();  
-	    	mutable.setTeleporterEnabled(true);
-	    	mutable.setTeleporterPort((long)6000);
-	    	mutable.saveSettings();
-	    	sessionin.unlockMachine();
-	    	return true;
+	    	IMachine mutable = sessionin.getMachine();
+	 
+    		mutable.setTeleporterEnabled(true);
+    		mutable.setTeleporterPort((long)6000);
+    		mutable.saveSettings();
+    		sessionin.unlockMachine();
+    		telep_enabled = true;
+	    	return telep_enabled;
 	    }
 	    
 	    public boolean disableTelep(IMachine m) {

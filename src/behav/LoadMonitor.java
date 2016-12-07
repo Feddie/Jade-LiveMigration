@@ -66,7 +66,7 @@ public class LoadMonitor extends TickerBehaviour {
 		}
 		else {
 			System.out.println("Current CPU load on " + hostname +": " + this.cpuload);
-			System.out.println("migratig = " + ((Teleporter) myAgent).migrating);
+			System.out.println("migrating = " + ((Teleporter) myAgent).migrating);
 			if (this.cpuload >= LoadMonitor.REG_THR ) { //Deregister from DF as a migration site	
 		  		checkRegistration();	
 				if (registered) {

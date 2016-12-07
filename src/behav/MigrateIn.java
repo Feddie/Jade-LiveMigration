@@ -57,7 +57,7 @@ public class MigrateIn extends OneShotBehaviour {
 			catch (UnknownHostException uh) {
 				uh.printStackTrace();
 			}
-		}
+		
 			//Inform source host that teleporting is ready here on destination
 			ACLMessage inform_ready = new ACLMessage(ACLMessage.AGREE);
 			inform_ready.addReceiver(requester);
@@ -92,12 +92,12 @@ public class MigrateIn extends OneShotBehaviour {
 			this.myAgent.doWait(2000);
 			((Teleporter) myAgent).migrating = false;
 		}
-		/*
+		
 		else {
 			System.out.println("Teleport wasn't successful :(");
 		}
-		*/
 		
+		}	
 	}
 
 	

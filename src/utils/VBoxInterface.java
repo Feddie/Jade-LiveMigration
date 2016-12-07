@@ -383,13 +383,16 @@ public class VBoxInterface {
 	    	ISession sessionin = mgr.getSessionObject();
 	    	m.lockMachine(sessionin, LockType.Shared);
 	    	IMachine mutable = sessionin.getMachine();
-	    	
+	    	try{
 	    		mutable.setTeleporterEnabled(true);
 	    		mutable.setTeleporterPort((long)6000);
 	    		mutable.saveSettings();
 	    		sessionin.unlockMachine();
 	    		telep_enabled = true;
-
+	    	}
+	    	catch (VBoxException V) {
+	    		System.out.println(V);
+	    	}
 	    	return telep_enabled;
 	    }
 	    

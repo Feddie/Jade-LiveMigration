@@ -66,8 +66,8 @@ public class LoadMonitor extends TickerBehaviour {
 		}
 		else {
 			System.out.println("Current CPU load on " + hostname +": " + this.cpuload);
-			
-			if (this.cpuload >= LoadMonitor.REG_THR || ((Teleporter) myAgent).migrating) { //Deregister from DF as a migration site	
+			System.out.println("migratig = " + ((Teleporter) myAgent).migrating);
+			if (this.cpuload >= LoadMonitor.REG_THR ) { //Deregister from DF as a migration site	
 		  		checkRegistration();	
 				if (registered) {
 			  			try {
@@ -79,7 +79,7 @@ public class LoadMonitor extends TickerBehaviour {
 							fe.printStackTrace();
 						}
 		  			}
-				if (this.cpuload > LoadMonitor.MIGR_THR) { //with a high CPU load, try to perform a migration	
+				if (this.cpuload > LoadMonitor.MIGR_THR && !((Teleporter) myAgent).migrating) { //with a high CPU load, try to perform a migration	
 					if (!runvms.isEmpty()) { 
 						//System.out.println(runvms.get(0));
 						String first_vm = runvms.get(0).getName();

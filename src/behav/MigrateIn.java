@@ -53,50 +53,52 @@ public class MigrateIn extends OneShotBehaviour {
 				VBoxInterface.getInstance().launchMachine(vm);
 				//Get Host IP
 				this.myIP = InetAddress.getLocalHost().getHostAddress().toString();
-				//Inform source host that teleporting is ready here on destination
-				ACLMessage inform_ready = new ACLMessage(ACLMessage.AGREE);
-				inform_ready.addReceiver(requester);
-				String content = this.myIP + ":" + this.vm;
-				inform_ready.setContent(content);
-				// Waiting for machine to be ready for teleport
-				
-				((Teleporter) myAgent).migrating = true;
-				
-				boolean TelepIn = false;
-				MachineState state;
-				while(!TelepIn){
-					state = vm.getState();
-					if (state == MachineState.TeleportingIn){
-						TelepIn = true; 
-					}
-				}
-				this.myAgent.doWait(2000);
-				
-				//sending the AGREE message to teleport source
-				this.myAgent.send(inform_ready);
-				
-				//Wait for machine to end teleport stage 
-				boolean EndTelep = false;
-				while(!EndTelep){
-					state = vm.getState();
-					if (state != MachineState.TeleportingIn){
-						EndTelep = true;
-					}
-				}
-				VBoxInterface.getInstance().disableTelep(vm);
-				this.myAgent.doWait(2000);
-				((Teleporter) myAgent).migrating = false;
-				}
+			}
 			catch (UnknownHostException uh) {
 				uh.printStackTrace();
 			}
-			
 		}
+			//Inform source host that teleporting is ready here on destination
+			ACLMessage inform_ready = new ACLMessage(ACLMessage.AGREE);
+			inform_ready.addReceiver(requester);
+			String content = this.myIP + ":" + this.vm;
+			inform_ready.setContent(content);
+			// Waiting for machine to be ready for teleport
+			
+			((Teleporter) myAgent).migrating = true;
+			
+			boolean TelepIn = false;
+			MachineState state;
+			while(!TelepIn){
+				state = vm.getState();
+				if (state == MachineState.TeleportingIn){
+					TelepIn = true; 
+				}
+			}
+			this.myAgent.doWait(2000);
+			
+			//sending the AGREE message to teleport source
+			this.myAgent.send(inform_ready);
+			
+			//Wait for machine to end teleport stage 
+			boolean EndTelep = false;
+			while(!EndTelep){
+				state = vm.getState();
+				if (state != MachineState.TeleportingIn){
+					EndTelep = true;
+				}
+			}
+			VBoxInterface.getInstance().disableTelep(vm);
+			this.myAgent.doWait(2000);
+			((Teleporter) myAgent).migrating = false;
+		}
+		/*
 		else {
 			System.out.println("Teleport wasn't successful :(");
 		}
+		*/
 		
 	}
 
 	
-}
+
